@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Career Navigator</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- Левая рейка маршрута: реальная последовательность шагов диагностики -->
+    <nav class="route" id="route" aria-label="Маршрут диагностики">
+      <div class="route__title">Твой маршрут</div>
+      <a class="route__stop" data-stop="profile" href="#screen-profile">
+        <span class="route__dot"></span>Профиль
+      </a>
+      <a class="route__stop" data-stop="hypotheses" href="#screen-hypotheses">
+        <span class="route__dot"></span>Профессии
+      </a>
+      <a class="route__stop" data-stop="skills" href="#screen-skills">
+        <span class="route__dot"></span>Навыки
+      </a>
+      <a class="route__stop" data-stop="universities" href="#screen-universities">
+        <span class="route__dot"></span>Вузы
+      </a>
+      <a class="route__stop" data-stop="roadmap" href="#screen-roadmap">
+        <span class="route__dot"></span>Roadmap
+      </a>
+    </nav>
+
+    <main class="content">
+
+      <!-- ЭКРАН 1: Профиль -->
+      <section class="screen" id="screen-profile">
+        <header class="screen__header">
+          <p class="eyebrow">Шаг 1</p>
+          <h1>Расскажи о себе</h1>
+          <p class="lede">Никаких «выбери один из четырёх вариантов». Пиши своими словами — этого достаточно, чтобы построить маршрут.</p>
+        </header>
+
+        <form id="profile-form" class="form">
+          <label class="field">
+            <span>В каком ты классе?</span>
+            <select name="grade" required>
+              <option value="9">9 класс</option>
+              <option value="10" selected>10 класс</option>
+              <option value="11">11 класс</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Что тебе нравится делать? (хобби, игры, проекты)</span>
+            <textarea name="interests" rows="3" required
+              placeholder="Например: люблю придумывать уровни в Roblox, снимаю видео для друзей, разбираю старую технику..."></textarea>
+          </label>
+
+          <label class="field">
+            <span>Какие школьные предметы даются легче или интереснее всего?</span>
+            <textarea name="favorite_subjects" rows="2" required
+              placeholder="Например: информатика, биология, обществознание..."></textarea>
+          </label>
+
+          <label class="field">
+            <span>Что ты уже умеешь? (даже если кажется, что это мелочь)</span>
+            <textarea name="current_skills" rows="2" required
+              placeholder="Например: базовый Python, монтирую видео, знаю английский B1..."></textarea>
+          </label>
+
+          <label class="field">
+            <span>Что для тебя важно в будущей работе? (необязательно)</span>
+            <textarea name="values" rows="2"
+              placeholder="Например: стабильность, творчество, высокий доход, помощь людям..."></textarea>
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              <span>Бюджет на обучение</span>
+              <select name="budget_level">
+                <option value="">Не важно</option>
+                <option value="low">Ограниченный</option>
+                <option value="medium">Средний</option>
+                <option value="high">Гибкий</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Страна/город (необязательно)</span>
+              <input type="text" name="country_pref" placeholder="Например: Казахстан, или без разницы" />
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn--primary" id="submit-btn">
+            Построить маршрут
+          </button>
+        </form>
+      </section>
+
+      <!-- ЭКРАН ЗАГРУЗКИ -->
+      <section class="screen screen--loading" id="screen-loading" hidden>
+        <div class="loader"></div>
+        <p class="loading-text" id="loading-text">AI анализирует твой профиль…</p>
+      </section>
+
+      <!-- ЭКРАН ОШИБКИ -->
+      <section class="screen" id="screen-error" hidden>
+        <p class="eyebrow">Что-то пошло не так</p>
+        <h1>Не получилось построить маршрут</h1>
+        <p class="lede" id="error-text">Проверь, что backend запущен и AI-ключ указан верно.</p>
+        <button class="btn btn--ghost" id="retry-btn">Попробовать снова</button>
+      </section>
+
+      <!-- ЭКРАН 2: Гипотезы профессий -->
+      <section class="screen" id="screen-hypotheses" hidden>
+        <header class="screen__header">
+          <p class="eyebrow">Шаг 2</p>
+          <h1>Твои карьерные гипотезы</h1>
+          <p class="lede">Это не приговор, а варианты для исследования. Выбери, какую хочешь рассмотреть подробнее.</p>
+        </header>
+        <div class="hypotheses-tabs" id="hypotheses-tabs"></div>
+        <article class="why-card" id="why-card"></article>
+        <div class="chips" id="specializations"></div>
+      </section>
+
+      <!-- ЭКРАН 3: Skills Gap -->
+      <section class="screen" id="screen-skills" hidden>
+        <header class="screen__header">
+          <p class="eyebrow">Шаг 3</p>
+          <h1>Чего не хватает</h1>
+          <p class="lede">Сравнение того, что уже есть, с тем, что нужно для выбранного пути.</p>
+        </header>
+        <div class="skills-list" id="skills-list"></div>
+      </section>
+
+      <!-- ЭКРАН 4: Университеты -->
+      <section class="screen" id="screen-universities" hidden>
+        <header class="screen__header">
+          <p class="eyebrow">Шаг 4</p>
+          <h1>Куда поступать</h1>
+          <p class="lede">Варианты вузов под выбранную специализацию и твои условия.</p>
+        </header>
+        <div class="uni-list" id="uni-list"></div>
+      </section>
+
+      <!-- ЭКРАН 5: Roadmap -->
+      <section class="screen" id="screen-roadmap" hidden>
+        <header class="screen__header">
+          <p class="eyebrow">Шаг 5</p>
+          <h1>Что делать уже сейчас</h1>
+          <p class="lede">Конкретные шаги, а не абстрактный совет «развивайся».</p>
+        </header>
+        <ol class="roadmap" id="roadmap-list"></ol>
+        <button class="btn btn--ghost" id="restart-btn">Пройти диагностику заново</button>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

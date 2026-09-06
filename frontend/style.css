@@ -1,0 +1,399 @@
+/*
+  DESIGN PLAN (Career Navigator)
+  --------------------------------
+  Метафора: ночная карта маршрута. Ученик — путешественник, у которого
+  впереди несколько станций (профиль → профессии → навыки → вузы → roadmap).
+  Рейка слева — не декоративная нумерация, а реальная последовательность шагов.
+
+  Color:
+    --ink        #12172B  фон, база
+    --ink-panel  #1B2140  панели на тёмном фоне
+    --paper      #F6F4EF  светлые карточки-острова на тёмном фоне
+    --amber      #E8A33D  текущая точка маршрута / основной CTA
+    --sage       #4F9C82  рост навыков / позитивный сигнал
+    --periwinkle #8C9EEA  ссылки, второстепенные акценты
+    --coral      #E2725B  дефицит навыка (gap), используется точечно
+
+  Type:
+    Fraunces (500-700) — заголовки, с характером, "путевые заметки"
+    Inter (400-700) — интерфейс и текст, читаемость
+
+  Layout: слева вертикальная рейка-маршрут (на мобильном — верхняя строка),
+  справа — контент текущего шага. Выравнивание контента — по левому краю,
+  короткая длина строки (~65ch) для lede-текста.
+*/
+
+:root {
+  --ink: #12172B;
+  --ink-panel: #1B2140;
+  --ink-line: #2A3159;
+  --paper: #F6F4EF;
+  --amber: #E8A33D;
+  --sage: #4F9C82;
+  --periwinkle: #8C9EEA;
+  --coral: #E2725B;
+  --text-on-ink: #E9E8F5;
+  --text-muted: #9AA0C4;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--text-on-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- Маршрутная рейка ---------- */
+.route {
+  border-right: 1px solid var(--ink-line);
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.route__title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.route__stop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+}
+
+.route__stop::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 100%;
+  width: 1px;
+  height: 12px;
+  background: var(--ink-line);
+}
+
+.route__stop:last-child::before { display: none; }
+
+.route__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-line);
+  flex-shrink: 0;
+}
+
+.route__stop.is-active {
+  color: var(--text-on-ink);
+  background: var(--ink-panel);
+}
+
+.route__stop.is-active .route__dot {
+  background: var(--amber);
+  box-shadow: 0 0 0 4px rgba(232, 163, 61, 0.18);
+}
+
+.route__stop.is-done .route__dot {
+  background: var(--sage);
+}
+
+/* ---------- Контент ---------- */
+.content {
+  padding: 48px 40px 96px;
+  max-width: 720px;
+}
+
+.screen__header { margin-bottom: 32px; }
+
+.eyebrow {
+  color: var(--periwinkle);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  color: #fff;
+}
+
+.lede {
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 62ch;
+  margin: 0;
+}
+
+/* ---------- Форма ---------- */
+.form { display: flex; flex-direction: column; gap: 20px; margin-top: 28px; }
+
+.field { display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--text-muted); }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+textarea, select, input[type="text"] {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--text-on-ink);
+  background: var(--ink-panel);
+  border: 1px solid var(--ink-line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+textarea:focus, select:focus, input:focus {
+  outline: 2px solid var(--periwinkle);
+  outline-offset: 1px;
+}
+
+.btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 14px 22px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.btn--primary { background: var(--amber); color: #1B1300; }
+.btn--primary:hover { filter: brightness(1.08); }
+.btn--primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--periwinkle);
+  border: 1px solid var(--ink-line);
+  margin-top: 24px;
+}
+
+/* ---------- Загрузка ---------- */
+.screen--loading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.loader {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--ink-line);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text { color: var(--text-muted); font-size: 15px; }
+
+/* ---------- Гипотезы профессий ---------- */
+.hypotheses-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.hyp-tab {
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--ink-line);
+  background: var(--ink-panel);
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hyp-tab.is-active {
+  border-color: var(--amber);
+  color: #fff;
+  background: rgba(232, 163, 61, 0.12);
+}
+
+.hyp-tab__score {
+  color: var(--sage);
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.why-card {
+  background: var(--paper);
+  color: #22262E;
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.why-card h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  margin: 0 0 12px;
+}
+
+.why-card p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #454A56;
+  margin: 0;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+
+.chip {
+  background: var(--ink-panel);
+  border: 1px solid var(--ink-line);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--periwinkle);
+}
+
+/* ---------- Skills gap ---------- */
+.skills-list { display: flex; flex-direction: column; gap: 22px; }
+
+.skill-item { background: var(--ink-panel); border-radius: 14px; padding: 18px 20px; }
+
+.skill-item__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.skill-item__name { font-weight: 600; font-size: 15px; }
+.skill-item__gap { font-size: 13px; color: var(--coral); }
+
+.bar-track {
+  position: relative;
+  height: 8px;
+  background: var(--ink-line);
+  border-radius: 999px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.bar-fill--have { position: absolute; height: 100%; background: var(--sage); border-radius: 999px; }
+.bar-fill--need {
+  position: absolute;
+  height: 100%;
+  border-right: 2px dashed var(--amber);
+}
+
+.skill-item__note { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+/* ---------- Университеты ---------- */
+.uni-list { display: flex; flex-direction: column; gap: 14px; }
+
+.uni-card {
+  background: var(--ink-panel);
+  border: 1px solid var(--ink-line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.uni-card__name { font-weight: 700; font-size: 16px; margin: 0 0 4px; }
+.uni-card__meta { font-size: 13px; color: var(--text-muted); margin: 0 0 8px; }
+.uni-card__req { font-size: 13px; color: var(--text-on-ink); max-width: 50ch; }
+
+.budget-tag {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(140, 158, 234, 0.15);
+  color: var(--periwinkle);
+  white-space: nowrap;
+}
+
+/* ---------- Roadmap ---------- */
+.roadmap { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+
+.roadmap li {
+  position: relative;
+  padding: 0 0 28px 32px;
+  border-left: 2px solid var(--ink-line);
+}
+
+.roadmap li::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--amber);
+  border: 2px solid var(--ink);
+}
+
+.roadmap li:last-child { border-left-color: transparent; }
+
+.roadmap__time { font-size: 13px; color: var(--periwinkle); font-weight: 600; margin-bottom: 4px; }
+.roadmap__action { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.roadmap__why { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+
+/* ---------- Мобильная адаптация ---------- */
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+
+  .route {
+    position: sticky;
+    top: 0;
+    height: auto;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--ink-line);
+    padding: 14px 16px;
+    background: var(--ink);
+    z-index: 10;
+  }
+
+  .route__title { display: none; }
+  .route__stop::before { display: none; }
+  .route__stop { flex-shrink: 0; }
+
+  .content { padding: 28px 20px 64px; }
+  h1 { font-size: 26px; }
+  .field-row { grid-template-columns: 1fr; }
+}
