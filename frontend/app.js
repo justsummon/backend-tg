@@ -5,7 +5,7 @@
  */
 
 // !!! Перед деплоем замените на адрес вашего задеплоенного backend !!!
-const BACKEND_URL = window.CAREER_NAV_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = "https://backend-tg-agf2.onrender.com/";
 
 // --- Telegram WebApp init -----------------------------------------------
 const tg = window.Telegram?.WebApp;
