@@ -17,7 +17,7 @@ def analyze_profile(profile: UserProfile) -> dict:
         raise Exception("GOOGLE_API_KEY не найден в настройках!")
 
     genai.configure(api_key=GOOGLE_API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-flash-latest')
 
     user_prompt = f"Класс: {profile.grade}, Интересы: {profile.interests}, Навыки: {profile.current_skills}"
 
